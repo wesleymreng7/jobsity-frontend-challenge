@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { useRemindersStore } from '../../stores/reminders'
 import type { Reminder } from '../../stores/reminders'
 import type { CalendarCell } from '../../types/calendar'
-import { formatTimeLabel, hexToRgba } from '../../utils/calendar'
+import { formatTimeLabel, hexToRgba, isDisabledCalendarCell } from '../../utils/calendar'
 
 const props = defineProps<{
   week: CalendarCell[]
@@ -21,17 +21,17 @@ const remindersStore = useRemindersStore()
 const remindersForWeek = computed(() =>
   props.week.map((day) => ({
     isoDate: day.isoDate,
-    reminders: day.isoDate ? remindersStore.remindersByDate(day.isoDate) : [],
+    reminders: day.isoDate && !day.isPlaceholder ? remindersStore.remindersByDate(day.isoDate) : [],
   }))
 )
 
 const handleDayClick = (day: CalendarCell) => {
-  if (day.isPlaceholder) return
+  if (!day.isoDate || isDisabledDay(day)) return
   emit('day-select', day)
 }
 
 const handleDayContext = (event: MouseEvent, day: CalendarCell) => {
-  if (day.isPlaceholder) return
+  if (!day.isoDate || isDisabledDay(day)) return
   emit('day-context', event, day)
 }
 
@@ -42,6 +42,8 @@ const handleReminderClick = (reminderId: string) => {
 const handleReminderContext = (event: MouseEvent, reminder: Reminder, isoDate: string) => {
   emit('reminder-context', event, reminder, isoDate)
 }
+
+const isDisabledDay = (day: CalendarCell) => isDisabledCalendarCell(day)
 </script>
 
 <template>
@@ -50,18 +52,18 @@ const handleReminderContext = (event: MouseEvent, reminder: Reminder, isoDate: s
       v-for="(day, index) in week"
       :key="`${day.isoDate ?? 'placeholder'}-${index}`"
       type="button"
-      :disabled="day.isPlaceholder"
       :class="[
         'relative flex h-56 flex-col overflow-hidden rounded-xl border p-3 text-right transition duration-150',
-        day.isPlaceholder
-          ? 'cursor-default border-transparent bg-transparent'
+        day.monthContext !== 'current'
+          ? 'border-transparent bg-slate-800/30 text-slate-500'
           : day.isWeekend
-            ? 'cursor-pointer border-emerald-500/30 bg-emerald-500/10 text-emerald-100 hover:border-emerald-400 hover:bg-emerald-500/20'
-            : 'cursor-pointer border-slate-800 bg-slate-900/70 text-slate-100 hover:border-emerald-400 hover:bg-slate-900',
-          day.isToday && !day.isPlaceholder
-            ? 'border-emerald-400 bg-emerald-500/15 text-emerald-50 shadow-[0_0_25px_rgba(16,185,129,0.35)]'
-            : '',
-        ]"
+            ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-100 hover:border-emerald-400 hover:bg-emerald-500/20'
+            : 'border-slate-800 bg-slate-900/70 text-slate-100 hover:border-emerald-400 hover:bg-slate-900',
+        day.isToday && !day.isPlaceholder
+          ? 'border-emerald-400 bg-emerald-500/15 text-emerald-50 shadow-[0_0_25px_rgba(16,185,129,0.35)]'
+          : '',
+        isDisabledDay(day) ? 'cursor-not-allowed opacity-60 pointer-events-none' : 'cursor-pointer',
+      ]"
       @click="handleDayClick(day)"
       @contextmenu.prevent.stop="handleDayContext($event, day)"
     >

@@ -5,6 +5,7 @@ import type { Reminder } from '../../stores/reminders'
 import BaseModal from './BaseModal.vue'
 import { useForm } from 'vee-validate'
 import * as yup from 'yup'
+import { isPastDateTime } from '@/utils/calendar'
 
 type ReminderForm = {
   title: string
@@ -71,7 +72,14 @@ const schema = yup.object({
   time: yup.string().required('Time is required'),
   city: yup.string().trim().required('City is required'),
   color: yup.string().required('Color is required'),
-})
+}).test(
+  'not-in-past',
+  'Reminders must be scheduled in the future.',
+  (value: ReminderForm) => {
+    if (!value) return false
+    return isPastDateTime(value.date, value.time) ? isEditMode.value : true
+  }
+)
 
 const { handleSubmit, setValues, errors, values } = useForm<ReminderForm>({
   validationSchema: schema,

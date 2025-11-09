@@ -5,5 +5,6 @@ export type CalendarCell = {
   isPlaceholder: boolean
   date: Date | null
   isoDate: string | null
+  monthContext: 'prev' | 'current' | 'next'
 }
 

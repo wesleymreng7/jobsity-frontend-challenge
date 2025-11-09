@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const props = defineProps<{
   monthLabel: string
+  daysOfWeek: string[]
 }>()
 
 const emit = defineEmits<{
@@ -40,6 +41,10 @@ const handleNext = () => emit('next')
           <path d="m9 6 6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </button>
+    </div>
+
+    <div class="grid grid-cols-7 gap-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+      <span v-for="day in daysOfWeek" :key="day" class="text-center">{{ day }}</span>
     </div>
   </header>
 </template>

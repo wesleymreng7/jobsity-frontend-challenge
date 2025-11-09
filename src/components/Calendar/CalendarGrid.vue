@@ -6,12 +6,10 @@ import type { CalendarCell } from '../../types/calendar'
 import CalendarContextMenu from './CalendarContextMenu.vue'
 import CalendarWeekRow from './CalendarWeekRow.vue'
 import CalendarHeader from './CalendarHeader.vue'
-import CalendarReminderModal from '../../components/modals/CalendarReminderModal.vue'
-import CalendarWeatherModal from '../../components/modals/CalendarWeatherModal.vue'
-import { useModal } from '../../composables/useModal'
-import { formatDateLabel } from '../../utils/calendar'
-
-const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] as const
+import CalendarReminderModal from '@/components/modals/CalendarReminderModal.vue'
+import CalendarWeatherModal from '@/components/modals/CalendarWeatherModal.vue'
+import { useModal } from '@/composables/useModal'
+import { formatDateLabel, getWeekdayLabels, buildCalendarMatrix } from '@/utils/calendar'
 
 const today = new Date()
 const state = reactive({
@@ -28,60 +26,9 @@ const monthLabel = computed(() =>
   }).format(state.currentMonth)
 )
 
-const calendarWeeks = computed(() => {
-  const firstDayIndex = state.currentMonth.getDay()
-  const daysInMonth = new Date(state.currentMonth.getFullYear(), state.currentMonth.getMonth() + 1, 0).getDate()
+const daysOfWeek = computed(() => getWeekdayLabels(undefined, 'short'))
 
-  const cells: CalendarCell[] = []
-
-  for (let index = 0; index < firstDayIndex; index += 1) {
-    cells.push({
-      label: '',
-      isWeekend: false,
-      isToday: false,
-      isPlaceholder: true,
-      date: null,
-      isoDate: null,
-    })
-  }
-
-  for (let day = 1; day <= daysInMonth; day += 1) {
-    const date = new Date(state.currentMonth.getFullYear(), state.currentMonth.getMonth(), day)
-    const isoDate = date.toISOString().slice(0, 10)
-    const isWeekend = date.getDay() === 0 || date.getDay() === 6
-    const isToday =
-      day === today.getDate() &&
-      today.getMonth() === state.currentMonth.getMonth() &&
-      today.getFullYear() === state.currentMonth.getFullYear()
-
-    cells.push({
-      label: String(day),
-      isWeekend,
-      isToday,
-      isPlaceholder: false,
-      date,
-      isoDate,
-    })
-  }
-
-  while (cells.length % 7 !== 0) {
-    cells.push({
-      label: '',
-      isWeekend: false,
-      isToday: false,
-      isPlaceholder: true,
-      date: null,
-      isoDate: null,
-    })
-  }
-
-  const weeks: CalendarCell[][] = []
-  for (let index = 0; index < cells.length; index += 7) {
-    weeks.push(cells.slice(index, index + 7))
-  }
-
-  return weeks
-})
+const calendarWeeks = computed(() => buildCalendarMatrix(state.currentMonth))
 
 const goToPreviousMonth = () => {
   state.currentMonth = new Date(state.currentMonth.getFullYear(), state.currentMonth.getMonth() - 1, 1)
@@ -143,7 +90,7 @@ const openContextMenuForReminder = (event: MouseEvent, reminder: Reminder, isoDa
 }
 
 const openCreateDialog = (cell: CalendarCell) => {
-  if (cell.isPlaceholder || !cell.isoDate) return
+  if (cell.monthContext !== 'current' || !cell.isoDate) return
   openModal({
     component: CalendarReminderModal,
     props: {
@@ -251,11 +198,7 @@ onBeforeUnmount(() => {
 
 <template>
   <section class="w-full rounded-2xl border border-slate-800/60 bg-slate-900/40 p-6 shadow-2xl shadow-emerald-500/10 backdrop-blur">
-    <CalendarHeader :month-label="monthLabel" @previous="goToPreviousMonth" @next="goToNextMonth" />
-
-    <div class="grid grid-cols-7 gap-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
-      <span v-for="day in daysOfWeek" :key="day" class="text-center">{{ day }}</span>
-    </div>
+    <CalendarHeader :month-label="monthLabel" :days-of-week="daysOfWeek" @previous="goToPreviousMonth" @next="goToNextMonth" />
 
     <div class="mt-3 flex flex-col gap-2">
       <CalendarWeekRow

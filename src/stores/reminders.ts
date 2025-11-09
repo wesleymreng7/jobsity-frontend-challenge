@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { fetchWeatherSummary } from '../services/weather'
+import { isPastDateTime } from '@/utils/calendar'
 
 export type Reminder = {
   id: string
@@ -69,6 +70,10 @@ export const useRemindersStore = defineStore('reminders', {
 
       if (!input.color) {
         throw new Error('Reminder color is required.')
+      }
+
+      if (isPastDateTime(input.date, input.time)) {
+        throw new Error('Reminders must be scheduled in the future.')
       }
 
       if (trimmed.length > MAX_REMINDER_LENGTH) {

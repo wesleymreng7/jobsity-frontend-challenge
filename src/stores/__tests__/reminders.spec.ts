@@ -178,5 +178,18 @@ describe('useRemindersStore', () => {
     expect(store.reminders).toHaveLength(1)
     expect(store.reminders[0].title).toBe('Gym')
   })
+
+  it('Should not allow reminders in the past', async () => {
+    const store = useRemindersStore()
+    await expect(
+      store.addReminder({
+        title: 'Doctor visit',
+        date: '2025-11-09',
+        time: '09:00',
+        city: 'Madrid',
+        color: '#f97316',
+      })
+    ).rejects.toThrow(/Reminders must be scheduled in the future./i)
+  })
 })
 
