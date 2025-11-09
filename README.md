@@ -2,6 +2,8 @@
 
 A Vue 3 + Vite calendar application built for the Jobsity front-end challenge. The UI lets users browse months, manage daily reminders, and view quick weather snapshots for each event. Tailwind handles styling, Pinia manages state, and Storybook documents components with live scenarios.
 
+**Live demo:** [jobsity-frontend-challenge-mu.vercel.app](https://jobsity-frontend-challenge-mu.vercel.app/)
+
 ## Tech Stack
 
 - **Vue 3 + Vite** for the application shell
