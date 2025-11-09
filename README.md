@@ -42,6 +42,15 @@ npm install
 | `npm run storybook` | Launch Storybook on port 6006 (uses Vite builder) |
 | `npm run build-storybook` | Generate the static Storybook bundle |
 
+## Architecture Decisions
+
+- **State in Pinia**: Reminders and weather metadata live in a single Pinia store (`src/stores/reminders.ts`) so components stay presentation-focused.
+- **Calendar helpers**: Date math and formatting sit in `src/utils/calendar.ts`, while UI is composed from `CalendarGrid`, `CalendarHeader`, `CalendarWeekRow`, and `CalendarContextMenu` for readability and reuse.
+- **Global modal system**: `useModal` + `ModalHost` provide stackable, keyboard-friendly dialogs used by reminder and weather modals across the app.
+- **Validation strategy**: VeeValidate + Yup enforce shared rules (text length, future-only scheduling, required city) before store mutations.
+- **Weather abstraction**: `src/services/weather.ts` isolates the mocked forecast logic so real APIs can slot in without touching component code.
+- **Storybook parity**: Stories seed a Pinia instance and reuse Tailwind styles, making Storybook the reference for component behavior/states.
+
 ## Key Folders
 
 - `src/components/Calendar/` – Calendar grid, header, week row, and context menu
