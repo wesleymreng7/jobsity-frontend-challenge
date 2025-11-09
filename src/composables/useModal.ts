@@ -36,7 +36,7 @@ const mergedListeners = (id: number, listeners: ModalListeners | undefined, clos
         close()
       }
     } else {
-      accumulator[key] = listeners[key]
+      accumulator[key] = listeners[key] ?? (() => {})
     }
 
     return accumulator
@@ -49,7 +49,7 @@ export function useModal() {
   }
 
   const closeTopModal = () => {
-    const last = modalStack.value.at(-1)
+    const last = modalStack.value[modalStack.value.length - 1]
     if (last) {
       closeModal(last.id)
     }
