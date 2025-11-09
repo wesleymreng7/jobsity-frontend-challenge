@@ -4,29 +4,33 @@ A Vue 3 + Vite calendar application built for the Jobsity front-end challenge. T
 
 **Live demo:** [jobsity-frontend-challenge-mu.vercel.app](https://jobsity-frontend-challenge-mu.vercel.app/)
 
-## Tech Stack
-
-- **Vue 3 + Vite** for the application shell
-- **Pinia** to store reminders and enforce validation rules
-- **Tailwind CSS** for styling and layout primitives
-- **VeeValidate + Yup** for form handling inside reminder modals
-- **Storybook** (Vue 3 + Vite builder) for interactive documentation
-- **Vitest** for unit testing the reminder store
-
 ## Features
 
-- Monthly calendar with weekend emphasis and Today highlight
-- Right-click context menus for adding, editing, deleting reminders, and viewing weather summaries
-- Mocked weather integration to surface a quick climate note for each event
-- Global modal system that renders reminder and weather experiences anywhere in the app
-- Storybook documentation that demonstrates common calendar states and usage tips
+- Create reminders by date/time with city entry and 30-character limit
+- Visual calendar shows reminders in chronological order per day
+- Reminder color picker with calendar badges matching the chosen color
+- Edit reminders (title, city, day, time, color) and delete them individually or in bulk per day
+- Mocked weather forecast per reminder using city + time metadata
+- Unit tests covering reminder creation limits and validation logic
+
+### Bonus Features
+
+- Month navigation allows browsing previous/next months
+- Reminder list gracefully handles multiple entries in a single day cell
+- Context menu option removes all reminders for the selected day
+
+### Extra Enhancements
+
+- Storybook documentation with multiple calendar scenarios and interactive notes
+- VeeValidate + Yup form schema preventing past-dated reminders and enforcing input rules
+- Global modal system with accessible keyboard shortcuts and stacked layering
+- Tailwind-powered theming with Today highlighting, weekend accents, and adjacent-month date display
 
 ## Getting Started
 
 ```bash
 npm install
 ```
-
 ## NPM Scripts
 
 | Script | Purpose |
@@ -57,3 +61,4 @@ Run `npm run storybook` to explore the stories in the browser. Storybook inherit
 ## Testing
 
 Vitest is configured for Node environment tests (`npm run test -- --run`). Current coverage focuses on reminder store logic (creation, validation, deletion). Add new tests under `src/stores/__tests__/` as functionality grows.
+
